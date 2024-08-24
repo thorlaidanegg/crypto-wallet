@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@solana/web3.js": "^1.95.3",
+    "@tabler/icons-react": "^3.12.0",
     "axios": "^1.7.5",
     "bip39": "^3.1.0",
     "clsx": "^2.1.1",

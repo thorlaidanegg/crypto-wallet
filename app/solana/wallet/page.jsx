@@ -62,10 +62,10 @@ const SolanaWallet = () => {
 
   return (
     <div className="flex flex-col justify-center items-center mt-10 space-y-10">
-      <div className="w-[90%] md:w-[80%] rounded-xl">
+      <div className="w-[90%] md:w-[80%] rounded-xl border-[0.5px] border-gray-700 px-10">
         <div 
           onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-          className="flex justify-between text-2xl md:text-5xl py-6 cursor-pointer text-white"
+          className="flex justify-between text-2xl md:text-3xl py-6 cursor-pointer text-white"
         >
           View Mnemonics
           {isDrawerOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
@@ -77,7 +77,7 @@ const SolanaWallet = () => {
         )}
       </div>
 
-      <div className="flex justify-between items-center text-2xl md:text-4xl font-bold w-[90%] md:w-[80%]">
+      <div className="flex justify-between items-center text-2xl md:text-5xl font-bold w-[90%] md:w-[80%]">
         <div className="text-white">Solana Wallet</div>
         <button onClick={generateKeysFromSeed} className="bg-blue-700 px-4 py-2 text-base md:text-xl rounded-lg hover:bg-blue-400">
           Create Wallet

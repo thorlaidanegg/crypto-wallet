@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Correct import for Next.js 14 App Router
 import { IconMenu2, IconX } from "@tabler/icons-react"; // Import icons for mobile menu
+import Image from 'next/image';
+
 
 const Navbar = () => {
   const router = useRouter();
@@ -25,7 +27,16 @@ const Navbar = () => {
   return (
     <div className=" text-white">
       <div className="flex justify-between items-center py-5 px-10">
-        <div className="text-xl font-semibold">Soleth</div>
+        <div className="flex gap-2">
+            <div className="text-xl font-semibold py-3">
+                Soleth
+            </div>
+            <Image
+                    src={'/logo.png'}
+                    width={50}
+                    height={50}
+            />
+        </div>
         <div className="md:hidden">
           {/* Mobile menu toggle button */}
           {isMobileMenuOpen ? (

@@ -9,6 +9,7 @@ import bs58 from 'bs58';  // Import the bs58 library for Base58 encoding
 import { IoIosArrowDown, IoIosArrowUp, IoIosEye, IoIosEyeOff } from "react-icons/io";
 import { HoverEffect } from "@/components/ui/card-hover-effect";
 import { MdDelete } from "react-icons/md";
+import { useRouter } from 'next/navigation'; // Correct import for useRouter
 
 const Page = () => {
   const [words, setWords] = useState([]);
@@ -18,6 +19,8 @@ const Page = () => {
   const [privateKeys, setPrivateKeys] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [visiblePrivateKeys, setVisiblePrivateKeys] = useState([]);
+
+  const router = useRouter(); // Initialize router
 
   const generateWordsAndSeed = () => {
     const mnemonic = generateMnemonic();
@@ -83,7 +86,7 @@ const Page = () => {
 
       <div className="flex flex-col gap-8 items-center w-[80%">
         {publicKeys.map((publicKey, index) => (
-          <div key={index} className="p-8 w-full bg-neutral-800 rounded-xl">
+          <div key={index} className="p-8 w-full bg-neutral-800 rounded-xl cursor-pointer" onClick={() => { router.push(`/solana/wallet/${publicKey}`); }}>
             <div className="flex justify-between items-center">
               <p className="font-bold text-white text-2xl">Wallet {index + 1}</p>
               <MdDelete

@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar"; // Adjust path as necessary
 import { IconWallet, IconInfoCircle } from "@tabler/icons-react"; // Import necessary icons
+import { FaEthereum } from "react-icons/fa";
+import { SiSolidity } from "react-icons/si";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,8 +14,8 @@ export const metadata: Metadata = {
 };
 
 const links = [
-  { label: "Solana", href: "/solana/wallet", icon: <IconWallet /> },
-  { label: "Ethereum", href: "/etherium/wallet", icon: <IconWallet /> },
+  { label: "Solana", href: "/solana/wallet", icon: <SiSolidity /> },
+  { label: "Ethereum", href: "/etherium/wallet", icon: <FaEthereum /> },
   { label: "About", href: "/about", icon: <IconInfoCircle /> },
 ];
 

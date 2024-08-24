@@ -26,7 +26,7 @@ const Page = ({params}) => {
     }
   };
 
-  const getAccountInfo = async () => {
+  const getAccountInfo = async (walletId) => {
     try {
       const res = await axios.post(
         'https://solana-mainnet.g.alchemy.com/v2/RXkKhOv8Dzuu2V8gdXF3VlpPl0T1wsVL',
@@ -34,7 +34,7 @@ const Page = ({params}) => {
           jsonrpc: '2.0',
           id: 1,
           method: 'getAccountInfo',
-          params: ['Eg4F6LW8DD3SvFLLigYJBFvRnXSBiLZYYJ3KEePDL95Q'],
+          params: [walletId],
         }
       );
       console.log(res.data);

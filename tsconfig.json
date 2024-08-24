@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/wallet/page.jsx", "app/wallet/[id]/page.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/wallet/page.jsx", "app/wallet/[id]/page.jsx", "app/etherium/wallet/page.jsx"],
   "exclude": ["node_modules"]
 }

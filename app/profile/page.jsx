@@ -1,16 +1,22 @@
-'use client'
+'use client';
 import { useAppContext } from '@/context/index';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import axios from 'axios';
+import { useSession } from "next-auth/react";
 
 const Page = () => {
-    const { isLoggedIn, email } = useAppContext(); 
+    const { isLoggedIn } = useAppContext(); 
     const [userInfo, setUserInfo] = useState(null);
+    const { data: session } = useSession();
 
     const getUserInfo = async () => {
         try {
-            const res = await axios.get(`${process.env.SITE_URL}/api/users/${email}`); // Replace with your API endpoint
+            const res = await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
+                headers: {
+                    Authorization: `Bearer ${session.accessToken}`,
+                },
+            });
             setUserInfo(res.data);
         } catch (error) {
             console.error("Error fetching user info:", error);
@@ -18,19 +24,20 @@ const Page = () => {
     };
 
     useEffect(() => {
-        if (isLoggedIn) {
+        if (isLoggedIn && session) {
             getUserInfo();
         }
-    }, [isLoggedIn]);
+    }, [isLoggedIn, session]);
 
     if (!isLoggedIn) {
         return (
-            <div className="flex top-1/3 left-1/4  gap-10 text-6xl absolute">
-                Login to access the page 
+            <div className="flex top-1/3 left-1/4 gap-10 text-6xl absolute">
+                Login to access the page
                 <Image
-                src={'/logo.png'}
-                width={100}
-                height={100}
+                    src={'/logo.png'}
+                    width={100}
+                    height={100}
+                    alt="Logo"
                 />
             </div>
         );
@@ -54,7 +61,7 @@ const Page = () => {
                 </div>
             </div>
 
-            <div className="rounded-lg shadow-lg w-full ">
+            <div className="rounded-lg shadow-lg w-full">
                 <div className='text-6xl font-semibold mb-10'>
                     Personal Details:
                 </div>

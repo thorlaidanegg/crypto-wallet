@@ -29,12 +29,18 @@ const UserSchema = new mongoose.Schema({
   solanaWallets: {
     type: Number,
   },
-  solanaWallets: {
+  ethWallets: {
     type: Number,
   },
-
+  provider: {
+    type: String, // e.g., 'google', 'github'
+  },
+  providerId: {
+    type: String,
+    unique: true,
+  },
 }, {
-  timestamps: true, 
+  timestamps: true,
 });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);

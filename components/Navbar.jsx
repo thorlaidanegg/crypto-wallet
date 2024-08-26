@@ -4,12 +4,14 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Correct import for Next.js 14 App Router
 import { IconMenu2, IconX } from "@tabler/icons-react"; // Import icons for mobile menu
 import Image from 'next/image';
-
+import { useSession,signOut,signIn } from "next-auth/react";
 
 const Navbar = () => {
   const router = useRouter();
   const [selected, setSelected] = useState('/');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State for mobile menu toggle
+  const { data: session, status } = useSession(); // Get session and status
+
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -35,6 +37,7 @@ const Navbar = () => {
                     src={'/logo.png'}
                     width={50}
                     height={50}
+                    alt='logo'
             />
         </div>
         <div className="md:hidden">
@@ -58,9 +61,16 @@ const Navbar = () => {
             </div>
           ))}
         </div>
-        <div className="hidden md:flex cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500">
-          Sign in
-        </div>
+        {status === "unauthenticated" ?
+          <div className="hidden md:flex cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500" onClick={() => signIn()}>
+            Sign in/up
+          </div>
+          :(
+            <div className="hidden md:flex cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500" onClick={() => signOut()}>
+            Sign out
+          </div>
+          )
+          }
       </div>
 
       {/* Mobile menu */}
@@ -77,9 +87,16 @@ const Navbar = () => {
               {item.name}
             </div>
           ))}
-          <div className="cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500">
-            Sign in
+          {status === "unauthenticated" ?
+          <div className="cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500" onClick={() => signIn()}>
+            Sign in/up
           </div>
+          :(
+            <div className="cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500" onClick={() => signOut()}>
+            Sign out
+            </div>
+          )
+          }
         </div>
       )}
     </div>

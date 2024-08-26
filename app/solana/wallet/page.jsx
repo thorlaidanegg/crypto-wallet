@@ -12,6 +12,8 @@ import { MdDelete } from "react-icons/md";
 import { useRouter } from 'next/navigation'; // Correct import for useRouter
 import { useAppContext } from '@/context/index'
 import Image from 'next/image';
+import { useSession } from "next-auth/react";
+import axios from 'axios';
 
 const SolanaWallet = () => {
   const [words, setWords] = useState([]);
@@ -21,31 +23,113 @@ const SolanaWallet = () => {
   const [privateKeys, setPrivateKeys] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [visiblePrivateKeys, setVisiblePrivateKeys] = useState([]);
+  const { data: session, status } = useSession(); // Get session and status
 
-  const { mnemonics, setMnemonics, isLoggedIn, setIsLoggedIn } = useAppContext() 
+  const { mnemonics, setMnemonics, isLoggedIn, setIsLoggedIn } = useAppContext();
 
   const router = useRouter(); // Initialize router
 
-  const generateWordsAndSeed = () => {
-    const mnemonic = generateMnemonic();
-    setWords(mnemonic.split(' '));
-    const seed = mnemonicToSeedSync(mnemonic);
-    setSeed(seed.toString('hex'));
+  useEffect(() => {
+    if (status === "authenticated") {
+      setIsLoggedIn(true);
+      checkOrCreateMnemonic();
+    }
+  }, [status]);
+
+  useEffect(() => {
+    if (seed && walletNo > 0) {
+      generateWallets(walletNo); // Pass walletNo as an argument
+    }
+  }, [seed]);
+
+  const checkOrCreateMnemonic = async () => {
+    try {
+      // Fetch user data
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      });
+
+      const userData = res.data;
+      setWalletNo(userData.solanaWallets || 0);
+
+      if (!userData.mnemonic) {
+        // If no mnemonic exists, generate and save it
+        const newMnemonic = generateMnemonic();
+        setWords(newMnemonic.split(' '));
+        const seed = mnemonicToSeedSync(newMnemonic);
+        setSeed(seed.toString('hex'));
+
+        // Save the mnemonic to the database
+        await axios.post(`${process.env.NEXT_PUBLIC_SITE_URL}/api/saveMnemonic`, {
+          mnemonic: newMnemonic,
+        }, {
+          headers: {
+            Authorization: `Bearer ${session.accessToken}`,
+          },
+        });
+      } else {
+        // If mnemonic exists, set it and generate wallets
+        const fetchedMnemonic = userData.mnemonic;
+        const fetchedSeed = mnemonicToSeedSync(fetchedMnemonic);
+        setWords(fetchedMnemonic.split(' '));
+        setSeed(fetchedSeed.toString('hex'));
+      }
+    } catch (error) {
+      console.error("Error checking or creating mnemonic:", error);
+    }
   };
 
-  const generateKeysFromSeed = () => {
-    const path = `m/44'/501'/${walletNo}'/0'`;
-    const derivedSeed = derivePath(path, Buffer.from(seed, 'hex')).key;
-    const secret = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
-    setWalletNo(walletNo + 1);
-    const publicKey = Keypair.fromSecretKey(secret).publicKey.toBase58();
-    
-    // Convert private key to Base58 format
-    const privateKeyBase58 = bs58.encode(secret);
-    
-    setPublicKeys((prevPublicKeys) => [...prevPublicKeys, publicKey]);
-    setPrivateKeys((prevPrivateKeys) => [...prevPrivateKeys, privateKeyBase58]);
-    setVisiblePrivateKeys((prevVisible) => [...prevVisible, false]);
+  const generateWallets = async (totalWallets) => {
+    const newPublicKeys = [];
+    const newPrivateKeys = [];
+    const newVisiblePrivateKeys = [];
+
+    for (let i = 0; i < totalWallets; i++) {
+      const path = `m/44'/501'/${i}'/0'`;
+      const derivedSeed = derivePath(path, Buffer.from(seed, 'hex')).key;
+      const secret = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
+      const publicKey = Keypair.fromSecretKey(secret).publicKey.toBase58();
+
+      // Convert private key to Base58 format
+      const privateKeyBase58 = bs58.encode(secret);
+
+      newPublicKeys.push(publicKey);
+      newPrivateKeys.push(privateKeyBase58);
+      newVisiblePrivateKeys.push(false);
+    }
+
+    setPublicKeys(newPublicKeys);
+    setPrivateKeys(newPrivateKeys);
+    setVisiblePrivateKeys(newVisiblePrivateKeys);
+  };
+
+  const addWallet = async () => {
+    try {
+      const newWalletNo = walletNo + 1;
+      setWalletNo(newWalletNo);
+
+      await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/addSolanaWallet`, {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      });
+
+      // Generate only the new wallet
+      const path = `m/44'/501'/${walletNo}'/0'`; // Use walletNo directly here
+      const derivedSeed = derivePath(path, Buffer.from(seed, 'hex')).key;
+      const secret = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
+      const publicKey = Keypair.fromSecretKey(secret).publicKey.toBase58();
+
+      const privateKeyBase58 = bs58.encode(secret);
+
+      setPublicKeys((prevPublicKeys) => [...prevPublicKeys, publicKey]);
+      setPrivateKeys((prevPrivateKeys) => [...prevPrivateKeys, privateKeyBase58]);
+      setVisiblePrivateKeys((prevVisible) => [...prevVisible, false]);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const togglePrivateKeyVisibility = (index) => {
@@ -54,21 +138,40 @@ const SolanaWallet = () => {
     );
   };
 
-  const deleteWallet = (index) => {
+  const deleteWallet = async (index) => {
     setPublicKeys((prevPublicKeys) => prevPublicKeys.filter((_, i) => i !== index));
     setPrivateKeys((prevPrivateKeys) => prevPrivateKeys.filter((_, i) => i !== index));
     setVisiblePrivateKeys((prevVisible) => prevVisible.filter((_, i) => i !== index));
+    setWalletNo(walletNo - 1);
+
+    try {
+      await axios.get(`${process.env.NEXT_PUBLIC_SITE_URL}/api/delSolanaWallet`, {
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+        },
+      });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
-  useEffect(() => {
-    generateWordsAndSeed();
-  }, []);
+  if (status === "loading") {
+    return <p>Loading...</p>; // Optional: Add a loading state while checking authentication status
+  }
+
+  if (status === "unauthenticated") {
+    return (
+      <div className="flex top-1/3 left-1/4 gap-10 text-6xl absolute">
+        Login to access the page
+        <Image src={'/logo.png'} width={100} height={100} />
+      </div>
+    );
+  }
 
   return (
-    isLoggedIn?(
-      <div className="flex flex-col justify-center items-center mt-10 space-y-10">
+    <div className="flex flex-col justify-center items-center mt-10 space-y-10">
       <div className="w-[90%] md:w-[80%] rounded-xl border-[0.5px] border-gray-700 px-10">
-        <div 
+        <div
           onClick={() => setIsDrawerOpen(!isDrawerOpen)}
           className="flex justify-between text-2xl md:text-3xl py-6 cursor-pointer text-white"
         >
@@ -84,7 +187,7 @@ const SolanaWallet = () => {
 
       <div className="flex justify-between items-center text-2xl md:text-5xl font-bold w-[90%] md:w-[80%]">
         <div className="text-white">Solana Wallet</div>
-        <button onClick={generateKeysFromSeed} className="bg-blue-700 px-4 py-2 text-base md:text-xl rounded-lg hover:bg-blue-400">
+        <button onClick={addWallet} className="bg-blue-700 px-4 py-2 text-base md:text-xl rounded-lg hover:bg-blue-400">
           Create Wallet
         </button>
       </div>
@@ -103,38 +206,30 @@ const SolanaWallet = () => {
             <p className="font-normal text-sm md:text-base text-neutral-200 mt-4">
               <strong>Public Key:</strong> {publicKey}
             </p>
-            <div className="flex justify-between items-center">
-              <div className="mt-4 flex items-center">
-                <p className="font-normal text-sm md:text-base text-neutral-200">
-                  <strong>Private Key:</strong>{' '}
-                  {visiblePrivateKeys[index] ? privateKeys[index] : '●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●'}
-                </p>
-                <button
-                  onClick={() => togglePrivateKeyVisibility(index)}
-                  className="ml-4 text-neutral-400 hover:text-white"
-                >
-                  {visiblePrivateKeys[index] ? <IoIosEyeOff size={20} /> : <IoIosEye size={20} />}
-                </button>
-              </div>
+            <div className="flex justify-between">
+              <p className="font-normal text-sm md:text-base text-neutral-200 mt-4">
+                <strong>Private Key:</strong>{" "}
+                {visiblePrivateKeys[index] ? privateKeys[index] : "•".repeat(privateKeys[index].length)}
+                {visiblePrivateKeys[index] ? (
+                  <IoIosEyeOff
+                    className="ml-2 text-white cursor-pointer inline"
+                    onClick={() => togglePrivateKeyVisibility(index)}
+                  />
+                ) : (
+                  <IoIosEye
+                    className="ml-2 text-white cursor-pointer inline"
+                    onClick={() => togglePrivateKeyVisibility(index)}
+                  />
+                )}
+              </p>
               <div className="cursor-pointer bg-blue-700 px-6 py-2 font-bold rounded-xl" onClick={() => { router.push(`/solana/wallet/${publicKey}`); }}>
-                Open
+                  Open
               </div>
             </div>
           </div>
         ))}
       </div>
     </div>
-    ):(
-      <div className="flex top-1/3 left-1/4  gap-10 text-6xl absolute">
-        Login to access the page 
-        <Image
-          src={'/logo.png'}
-          width={100}
-          height={100}
-        />
-      </div>
-    )
-    
   );
 };
 

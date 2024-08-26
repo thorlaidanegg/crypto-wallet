@@ -12,7 +12,7 @@ const Page = ({ params }) => {
   const getBalance = async (walletId) => {
     try {
       const res = await axios.post(
-        'https://solana-mainnet.g.alchemy.com/v2/RXkKhOv8Dzuu2V8gdXF3VlpPl0T1wsVL',
+        `${process.env.SOL_URL}`,
         {
           jsonrpc: '2.0',
           id: 1,

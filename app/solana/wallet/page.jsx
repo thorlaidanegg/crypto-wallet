@@ -10,6 +10,8 @@ import { IoIosArrowDown, IoIosArrowUp, IoIosEye, IoIosEyeOff } from "react-icons
 import { HoverEffect } from "@/components/ui/card-hover-effect";
 import { MdDelete } from "react-icons/md";
 import { useRouter } from 'next/navigation'; // Correct import for useRouter
+import { useAppContext } from '@/context/index'
+import Image from 'next/image';
 
 const SolanaWallet = () => {
   const [words, setWords] = useState([]);
@@ -19,6 +21,8 @@ const SolanaWallet = () => {
   const [privateKeys, setPrivateKeys] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [visiblePrivateKeys, setVisiblePrivateKeys] = useState([]);
+
+  const { mnemonics, setMnemonics, isLoggedIn, setIsLoggedIn } = useAppContext() 
 
   const router = useRouter(); // Initialize router
 
@@ -61,7 +65,8 @@ const SolanaWallet = () => {
   }, []);
 
   return (
-    <div className="flex flex-col justify-center items-center mt-10 space-y-10">
+    isLoggedIn?(
+      <div className="flex flex-col justify-center items-center mt-10 space-y-10">
       <div className="w-[90%] md:w-[80%] rounded-xl border-[0.5px] border-gray-700 px-10">
         <div 
           onClick={() => setIsDrawerOpen(!isDrawerOpen)}
@@ -119,6 +124,17 @@ const SolanaWallet = () => {
         ))}
       </div>
     </div>
+    ):(
+      <div className="flex top-1/3 left-1/4  gap-10 text-6xl absolute">
+        Login to access the page 
+        <Image
+          src={'/logo.png'}
+          width={100}
+          height={100}
+        />
+      </div>
+    )
+    
   );
 };
 

@@ -1,5 +1,5 @@
 import connectMongo from '@/lib/dbConnect';
-import User from '@/models/User';
+import User from '@/models/User.js';
 import { getToken } from 'next-auth/jwt';
 
 export async function GET(req) {

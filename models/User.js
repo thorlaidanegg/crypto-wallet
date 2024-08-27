@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 
-// Define the User schema
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -17,12 +16,13 @@ const UserSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    unique: true,  // Ensure unique values only for non-null entries
-    sparse: true,  // Allow multiple null values
+    unique: true, // Optional: if you need unique phone numbers
+    sparse: true, // Optional: allows multiple null values
   },
   mnemonic: {
     type: String,
     unique: true,
+    sparse: true, // Add sparse to allow multiple null values
   },
   wallets: {
     type: Number,
@@ -34,15 +34,15 @@ const UserSchema = new mongoose.Schema({
     type: Number,
   },
   provider: {
-    type: String,  // e.g., 'google', 'github'
+    type: String, // e.g., 'google', 'github'
   },
   providerId: {
     type: String,
     unique: true,
+    sparse: true, // Optional: if providerId can be null
   },
 }, {
   timestamps: true,
 });
 
-// Export the model
 export default mongoose.models.User || mongoose.model('User', UserSchema);

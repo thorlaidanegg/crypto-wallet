@@ -15,8 +15,14 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
   },
+  phone: {
+    type: String,
+    unique: true,  // Ensure unique values only for non-null entries
+    sparse: true,  // Allow multiple null values
+  },
   mnemonic: {
     type: String,
+    unique: true,
   },
   wallets: {
     type: Number,

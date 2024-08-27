@@ -64,7 +64,7 @@ const Navbar = () => {
           <div
             className="hidden md:flex cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500"
             onClick={() =>
-              signIn('google', { callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/after-signin` }) // Customize redirect URL after sign-in
+              signIn('google', { callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}` }) // Customize redirect URL after sign-in
             }
           >
             Sign in/up
@@ -73,7 +73,7 @@ const Navbar = () => {
           <div
             className="hidden md:flex cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500"
             onClick={() =>
-              signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/` }) // Customize redirect URL after sign-out
+              signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}` }) // Customize redirect URL after sign-out
             }
           >
             Sign out
@@ -99,7 +99,7 @@ const Navbar = () => {
             <div
               className="cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500"
               onClick={() =>
-                signIn('google', { callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/after-signin` }) // Customize redirect URL after sign-in
+                signIn('google', { callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}` }) // Customize redirect URL after sign-in
               }
             >
               Sign in/up
@@ -108,7 +108,7 @@ const Navbar = () => {
             <div
               className="cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500"
               onClick={() =>
-                signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/` }) // Customize redirect URL after sign-out
+                signOut({ callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}` }) // Customize redirect URL after sign-out
               }
             >
               Sign out

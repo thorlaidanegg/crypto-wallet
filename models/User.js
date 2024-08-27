@@ -1,5 +1,3 @@
-import mongoose from 'mongoose';
-
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -13,7 +11,7 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    // Remove required attribute for password
   },
   phone: {
     type: String,
@@ -42,5 +40,3 @@ const UserSchema = new mongoose.Schema({
 }, {
   timestamps: true,
 });
-
-export default mongoose.models.User || mongoose.model('User', UserSchema);

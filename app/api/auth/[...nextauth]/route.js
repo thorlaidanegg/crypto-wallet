@@ -18,11 +18,12 @@ const authOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async signIn({ user, account, profile }) {
-      await connectMongo();
+      await connectMongo(); // Ensure database connection
 
       const existingUser = await User.findOne({ email: user.email });
 
       if (!existingUser) {
+        // If the user doesn't exist, create a new one
         await User.create({
           username: profile.name || user.name,
           email: user.email,
@@ -37,8 +38,12 @@ const authOptions = {
       return true;
     },
     async session({ session, token }) {
-      session.userId = token.sub;
-      session.accessToken = token.accessToken;
+      if (token?.sub) {
+        session.userId = token.sub;
+      }
+      if (token?.accessToken) {
+        session.accessToken = token.accessToken;
+      }
       return session;
     },
     async jwt({ token, account, user }) {

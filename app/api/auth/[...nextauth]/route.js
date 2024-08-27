@@ -4,7 +4,7 @@ import GitHubProvider from 'next-auth/providers/github';
 import connectMongo from '@/lib/dbConnect';
 import User from '@/models/User';
 
-export const authOptions = {
+const authOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,

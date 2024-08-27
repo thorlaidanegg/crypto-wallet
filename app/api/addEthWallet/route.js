@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import connectMongo from '@/lib/dbConnect';
 import User from '@/models/User.js';
 import { getToken } from 'next-auth/jwt';
@@ -37,7 +38,6 @@ export async function GET(req) {
     console.log("Current wallets:", user.wallets);
 
     // Ensure the fields are numbers before incrementing
-    // user.solanaWallets = user.solanaWallets || 0;
     user.ethWallets = user.ethWallets || 0;
     user.wallets = user.wallets || 0;
 

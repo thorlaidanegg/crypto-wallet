@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+// Define the User schema
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -16,11 +17,12 @@ const UserSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    sparse: true, // Allows multiple null values while maintaining uniqueness for non-null values
+    unique: true,  // Ensure unique values only for non-null entries
+    sparse: true,  // Allow multiple null values
   },
   mnemonic: {
     type: String,
-    sparse: true, // Use sparse index to allow null values but maintain uniqueness for non-null values
+    unique: true,
   },
   wallets: {
     type: Number,
@@ -32,18 +34,15 @@ const UserSchema = new mongoose.Schema({
     type: Number,
   },
   provider: {
-    type: String, // e.g., 'google', 'github'
+    type: String,  // e.g., 'google', 'github'
   },
   providerId: {
     type: String,
-    sparse: true, // Use sparse index to allow null values but maintain uniqueness for non-null values
+    unique: true,
   },
 }, {
   timestamps: true,
 });
 
-// Ensure indexes are properly created (you can drop existing indexes manually if needed)
-UserSchema.index({ mnemonic: 1 }, { unique: true, sparse: true });
-UserSchema.index({ providerId: 1 }, { unique: true, sparse: true });
-
+// Export the model
 export default mongoose.models.User || mongoose.model('User', UserSchema);

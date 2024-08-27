@@ -12,7 +12,7 @@ export default function Home() {
           Soleth
         </h2>
         <p className="text-white text-lg md:text-2xl max-w-xl mt-6 text-center">
-          A clean modern crypto wallet
+          A clean modern crypto wallet!
         </p>
       </Vortex>
     </div>

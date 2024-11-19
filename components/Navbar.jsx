@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'; // Correct import for Next.js 14 Ap
 import { IconMenu2, IconX } from "@tabler/icons-react"; // Import icons for mobile menu
 import Image from 'next/image';
 import { useSession, signOut, signIn } from "next-auth/react";
+import toast, { Toaster } from 'react-hot-toast';
 
 const Navbar = () => {
   const router = useRouter();

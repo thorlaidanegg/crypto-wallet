@@ -16,7 +16,7 @@ const UserSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    unique: true, // Optional: if you need unique phone numbers
+    unique: true, 
     sparse: true, // Optional: allows multiple null values
   },
   mnemonic: {
